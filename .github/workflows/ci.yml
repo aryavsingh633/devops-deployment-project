@@ -1,0 +1,38 @@
+
+name: DevOps CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t devops-app:${{ github.sha }} .
+
+      - name: Start application container
+        run: docker run -d --name devops-app -p 8080:80 devops-app:${{ github.sha }}
+
+      - name: Wait for application to start
+        run: sleep 3
+
+      - name: Check application health
+        run: bash scripts/health-check.sh
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs devops-app
+
+      - name: Stop application container
+        if: always()
+        run: docker rm -f devops-app || true
