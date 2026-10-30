@@ -60,3 +60,19 @@ jobs:
           tags: |
             aryav17/devops-deployment-project:latest
             aryav17/devops-deployment-project:${{ github.sha }}
+
+  deploy:
+    needs: publish-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy application
+        run: bash scripts/deploy.sh
+
+      - name: Verify deployment
+        run: bash scripts/health-check.sh http://localhost:8080
+
