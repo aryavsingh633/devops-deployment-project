@@ -10,6 +10,7 @@ on:
       - main
 
 jobs:
+  # JOB 1: Build and test the application
   build-and-test:
     runs-on: ubuntu-latest
 
@@ -37,6 +38,7 @@ jobs:
         if: always()
         run: docker rm -f devops-app || true
 
+  # JOB 2: Publish Docker image to Docker Hub
   publish-image:
     needs: build-and-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -61,7 +63,8 @@ jobs:
             aryav17/devops-deployment-project:latest
             aryav17/devops-deployment-project:${{ github.sha }}
 
-    deploy:
+  # JOB 3: Deploy application to AWS EC2
+  deploy:
     needs: publish-image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: self-hosted
@@ -103,4 +106,3 @@ jobs:
         run: |
           curl -fsS "http://$EC2_HOST/" > /dev/null
           echo "EC2 application is responding successfully!"
-
