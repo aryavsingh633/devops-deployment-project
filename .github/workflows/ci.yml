@@ -103,29 +103,5 @@ jobs:
         run: |
           ssh -i ~/.ssh/github-actions-ec2 \
             -o StrictHostKeyChecking=accept-new \
-            "$EC2_USER@$EC2_HOST" "
-              set -e
-
-              sudo docker pull aryav17/devops-deployment-project:$IMAGE_TAG
-
-              sudo docker rm -f devops-app || true
-
-              sudo docker run -d \
-                --name devops-app \
-                --restart unless-stopped \
-                -p 80:80 \
-                aryav17/devops-deployment-project:$IMAGE_TAG
-
-              sleep 3
-
-              curl -fsS http://localhost/ > /dev/null
-
-              echo 'Deployment successful!'
-            "
-
-      - name: Verify deployed application
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-        run: |
-          curl -fsS "http://$EC2_HOST/" > /dev/null
-          echo "EC2 application is responding successfully!"
+            "$EC2_USER@$EC2_HOST" \
+            "bash ~/deploy.sh '$IMAGE_TAG'"
