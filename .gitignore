@@ -1,0 +1,12 @@
+actions-runner/
+
+# GitHub Actions self-hosted runner
+actions-runner/
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log
